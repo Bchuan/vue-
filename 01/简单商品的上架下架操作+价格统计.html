@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="https://cdn.bootcss.com/vue/2.4.2/vue.min.js" type="text/javascript" charset="utf-8"></script>
+
+	</head>
+	<style type="text/css">
+		* {
+			margin: 0;
+			padding: 10px;
+			list-style: none;
+		}
+		
+		body {
+			background: #DDDDDD;
+			padding: 20px 10px;
+		}
+		a{
+			text-decoration:none;
+		}
+		.cur {
+			background: white;
+		}
+		
+		.menu {
+			margin: 50px auto;
+		}
+		
+		.list_a {
+			margin-bottom: 20px;
+		}
+		
+		.a {
+			display: inline-block;
+		}
+		
+		.b {
+			display: flex;
+			justify-content: space-between;
+		}
+		
+		li>span {
+			margin-left: 20px;
+		}
+		
+		.p {
+			width: 20px;
+			text-align: center;
+			height: 29px;
+			line-height: 25px;
+			padding: 0px;
+			margin: 0;
+		}
+		.pl{
+			height: 25px;
+			width: 30px;
+			text-align: center;
+			line-height: 25px;
+			padding:0px;
+			margin: 0;
+		}
+		.ab{
+			color: blue;
+		}
+		.aa{
+			margin-right: 20px;
+		}
+		
+	</style>
+
+	<body>
+		<div id="box">
+			<!--
+				表单
+				数据绑定：v-model
+			-->
+			<!--
+				自定义指令  v-check
+				命名：v-自定义名称=变量/对象
+			-->
+			<input type="text" v-check="{'style':'special','val':curInputName}" name="" id="" value="" placeholder="请添加名称" v-model="curInputName" />
+			<input type="text" v-check="{'style':'number','val':curInputPrice}" name="" id="" value="" placeholder="请添加价格" v-model="curInputPrice" />
+			<input type="button" :disabled="(!NameCheck||!PriceCheck)" value="添加" @click="addData()" />
+			<ul class="menu">
+				<!--
+					点击事件：
+					完整：v-on:click
+					缩写：@click
+					
+					绑定属性：
+					完整：v-bind:属性名
+					缩写： ：属性名
+				-->
+				<li v-on:click="change(1)" v-bind:class="{cur:boxnum==1}">动物</li>
+				<li v-on:click="change(2)" v-bind:class="{cur:boxnum==2}">植物</li>
+			</ul>
+			<ul v-if="boxnum==1" class="cur">
+				<!--
+					遍历循环：
+					简单：v-for="自定义子名  in 数据模型（数组）"
+					复杂：v-for="(子名，数组下标) in 数据模型"
+				-->
+				<li class="list_a b">
+					<p>
+						<input type="checkbox" :checked="CheckAll" v-model="CheckAll" @click="checked()" />
+						<span>名字</span>
+					</p>
+					<div>价格</div>
+					<div>数量</div>
+					<div @click="del()" class="ab">
+						删除
+					</div>
+				</li>
+				<li v-for="(item,index) in animal" class="list_a b">
+					<p><input type="checkbox" name="" id="" :value="item" :checked="item.animalCheck" v-model="animalCheck" @click="Achecked(item)" />
+						<span @dblclick="editData(item)" v-show="item.typeLi">{{item.name}}</span><input type="text" v-show="!item.typeLi" v-bind:value="item.name" v-model="item.name" @keydown.enter="next(item)" v-focus="item == editItem" /></p>
+					<p>￥：<span @dblclick="editData(item)" v-show="item.typeLi">{{item.price}}</span><input type="text" v-show="!item.typeLi" v-bind:value="item.price" v-model="item.price" v-focus="item == editItem1" @blur="changeCount(item)" @keydown.enter="changeCount(item)" /></p>
+					<div class="aa">
+						<input type="button" name="" id="" value="-" class="p" @click="reduce(item)"/>
+						<input type="text" name="" id="" value="1" class="pl" v-model="item.num"/>
+						<input type="button" name="" id="" value="+" class="p" @click="plus(item)"/>
+
+					</div>
+					<a href="#" @click="detelData(index)" class="aa">X</a>
+				</li>
+				<li><span>数量：{{animalCheck.length}}</span> <span>价格：{{countPrice}}</span></li>
+			</ul>
+			<ul v-if="boxnum==2" class="cur">
+				<li class="list_a b">
+					<p>
+						<input type="checkbox" :checked="CheckAll1" v-model="CheckAll1" @click="checked()" />
+						<span>名字</span>
+					</p>
+					<div>价格</div>
+					<div>数量</div>
+					<div @click="del()" class="ab">
+						删除
+					</div>
+				</li>
+				<li v-for="(item,index) in plant" class="list_a b">
+					<p><input type="checkbox" name="" id="" :value="item" :checked="item.animalCheck" v-model="plantCheck" @click="Achecked(item)" />
+						<span @dblclick="editData(item)" v-show="item.typeLi">{{item.name}}</span><input type="text" v-show="!item.typeLi" v-bind:value="item.name" v-model="item.name" @keydown.enter="next(item)" v-focus="item == editItem" /></p>
+					<p>￥：<span @dblclick="editData(item)" v-show="item.typeLi">{{item.price}}</span><input type="text" v-show="!item.typeLi" v-bind:value="item.price" v-focus="item == editItem1" v-model="item.price" @blur="changeCount(item)" @keydown.enter="changeCount(item)" /></p>
+					<div class="aa">
+						<input type="button" name="" id="" value="-" class="p" @click="reduce(item)"/>
+						<input type="text" name="" id="" value="item.num" v-model="item.num" class="pl"/>
+						<input type="button" name="" id="" value="+" class="p" @click="plus(item)"/>
+
+					</div>
+					<a href="#" @click="detelData(index)" class="aa">X</a>
+				</li>
+				<li><span>数量：{{plantCheck.length}}</span> <span>价格：{{countPrice}}</span></li>
+			</ul>
+		</div>
+	</body>
+	<script type="text/javascript">
+		//自定义指令
+		//钩子函数
+		//指令定义函数提供了几个钩子函数（可选）：
+		//bind: 只调用一次，指令第一次绑定到元素时调用，用这个钩子函数可以定义一个在绑定时执行一次的初始化动作。
+		//inserted: 被绑定元素插入父节点时调用（父节点存在即可调用，不必存在于 document 中）。
+		//update: 所在组件的 VNode 更新时调用，但是可能发生在其孩子的 VNode 更新之前。指令的值可能发生了改变也可能没有。但是你可以通过比较更新前后的值来忽略不必要的模板更新 (详细的钩子函数参数见下)。
+		//componentUpdated: 所在组件的 VNode 及其孩子的 VNode 全部更新时调用。
+		//unbind: 只调用一次， 指令与元素解绑时调用。
+		Vue.prototype.NameCheck = false;
+		Vue.prototype.PriceCheck = false;
+		Vue.directive('check', {
+			bind: function() {
+				console.log(1)
+			},
+			update: function(el, binding) {
+				let curr = true;
+				if(!binding.value.val) return; //如果值没有进行更新，则直接返回
+				if(binding.value.val != binding.oldValue.val) {
+					console.log(11);
+					if(binding.value.style == "special") {
+						if(!/^[\w|\u4E00-\u9FFF]*$/g.test(binding.value.val)) {
+							curr = false;
+							Vue.prototype.NameCheck = false;
+						} else {
+							Vue.prototype.NameCheck = true;
+						}
+					} else if(binding.value.style == "number") {
+						if(!/^([0-9]*)+(.[0-9]{1,2})?$/g.test(binding.value.val)) {
+							curr = false;
+							Vue.prototype.PriceCheck = false;
+						} else {
+							Vue.prototype.PriceCheck = true;
+						}
+					}
+					if(curr) {
+						el.style.border = "1px solid #cccccc";
+					} else {
+						el.style.border = "1px solid red";
+					}
+				}
+//				console.log(curr)
+			}
+		})
+		//实例化对象
+		new Vue({
+			el: "#box", //
+			data: {
+				editItem: null,
+				editItem1: null,
+				boxnum: 1,
+				curInputName: null,
+				curInputPrice: null,
+				animalCheck: [],
+				CheckAll: false,
+				plantCheck: [],
+				CheckAll1: false,
+				animal: [{
+					name: "霸天虎",
+					price: 15000,
+					typeLi: true,
+					animalCheck: false,
+					num:1
+				}, {
+					name: "太虚龙",
+					price: 14000,
+					typeLi: true,
+					animalCheck: false,
+					num:1
+				}, {
+					name: "天妖凤",
+					price: 13000,
+					typeLi: true,
+					animalCheck: false,
+					num:1
+				}],
+				plant: [{
+					name: "古兰花",
+					price: 13000,
+					typeLi: true,
+					animalCheck: false,
+					num:1
+				}, {
+					name: "血樱草",
+					price: 12000,
+					typeLi: true,
+					animalCheck: false,
+					num:1
+				}, {
+					name: "神彩叶",
+					price: 10000,
+					typeLi: true,
+					animalCheck: false,
+					num:1
+				}]
+			},
+			computed: {
+				countPrice: function() {
+					let price = 0;
+					let that = this.getCurrNum();
+					if(that == this.animal) {
+						for(let i = 0; i < this.animalCheck.length; i++) {
+							price += this.animalCheck[i].price*this.animalCheck[i].num;
+						}
+					} else {
+						for(let i = 0; i < this.plantCheck.length; i++) {
+							price += this.plantCheck[i].price*this.plantCheck[i].num;
+						}
+					}
+					return price;
+				}
+			},
+			methods: {
+				change: function(id) {
+					this.boxnum = id;
+				},
+				addData: function() { //添加数据
+					if(!this.curInputName || !this.curInputPrice) return;
+					let that = this.getCurrNum();
+					that.push({
+						name: this.curInputName,
+						price: this.curInputPrice,
+						typeLi: true,
+						animalCheck: false,
+						num:1
+					})
+					this.curInputName = null;
+					this.curInputPrice = null;
+					Vue.prototype.NameCheck = false;
+					Vue.prototype.PriceCheck = false;
+				},
+				detelData: function(index) { //删除
+//					console.log(111);
+					let that = this.getCurrNum();
+					if(that==this.animal){
+						if(that[index].animalCheck){
+							for(let i=0;i<this.animalCheck.length;i++)
+							{
+								if(this.animalCheck[i]==that[index])
+								{
+									this.animalCheck.splice(i,1);
+									break;
+								}
+							}
+						}
+					}else{
+						if(that[index].animalCheck){
+							for(let i=0;i<this.plantCheck.length;i++)
+							{
+								if(this.plantCheck[i]==that[index])
+								{
+									this.plantCheck.splice(i,1);
+									break;
+								}
+							}
+						}
+					}
+					
+					that.splice(index, 1);
+				},
+				editData: function(item) { //点击修改
+					//					console.log(item);
+					item.typeLi = false;
+					this.editItem = item; //第一个输入框聚焦的条件
+				},
+				next: function(item) { //获取下一个输入框的焦点
+					this.editItem1 = item; //第二个输入框聚焦的条件
+					this.editItem = null;
+				},
+				changeCount: function(item) { //失焦提交数据
+					item.typeLi = true;
+					this.editItem1 = null;
+				},
+				getCurrNum: function() { //获取当前的菜单值
+					if(this.boxnum == 1) {
+						return this.animal;
+					} else if(this.boxnum == 2) {
+						return this.plant;
+					}
+				},
+				checked: function() { //全选
+//					console.log(this.CheckAll1)
+					let that = this.getCurrNum();
+					if(that == this.animal) {
+						if(this.CheckAll) {
+							for(let i=0;i<that.length;i++)
+							{
+								that.animalCheck=true;
+							}
+							this.animalCheck = that;
+						} else {
+							for(let i=0;i<that.length;i++)
+							{
+								that.animalCheck=false;
+							}
+							this.animalCheck = [];
+						}
+					} else {
+						if(this.CheckAll1) {
+							this.plantCheck = that;
+							for(let i=0;i<that.length;i++)
+							{
+								that.animalCheck=true;
+							}
+						} else {
+							for(let i=0;i<that.length;i++)
+							{
+								that.animalCheck=false;
+							}
+							this.plantCheck = [];
+						}
+					}
+				},
+				Achecked: function(item) { //列表单选框
+					let that = this.getCurrNum();
+					let str = true;
+					item.animalCheck=~item.animalCheck;
+					if(that == this.animal) {
+						if(this.animalCheck.length != that.length) {
+							str = false;
+						} else {
+							str = true;
+						}
+						this.CheckAll = str;
+					} else {
+						if(this.plantCheck.length != that.length) {
+							str = false;
+						} else {
+							str = true;
+						}
+						this.CheckAll1 = str;
+					}
+
+					console.log(str)
+				},
+				reduce:function(item){
+//					console.log(item.num)
+					if(item.num>1){
+						item.num=item.num-1;
+					}
+				},
+				plus:function(item){
+//					console.log(item)
+					item.num=item.num+1;
+				},
+				del: function() { //删除多个
+//					console.log(11)
+					let that = this.getCurrNum();
+					for(let i = 0; i < that.length;) {
+						if(that[i].animalCheck) {
+							that.splice(i, 1);
+						} else {
+							i++
+						}
+						
+					}
+					if(that==this.animal){
+						this.animalCheck=[];
+					}
+					else{
+						this.plantCheck=[];
+					}
+					if(that.length == 0) {
+						if(that == this.animal) {
+							this.CheckAll = false;
+						} else {
+							this.CheckAll1 = false;
+						}
+					}
+					
+				}
+
+			},
+			directives: {
+				'focus': function(el, binding) {
+					//					console.log(el);
+					//					console.log(binding);
+					if(binding.value) {
+						el.focus()
+					}
+				}
+			}
+		})
+	</script>
+
+</html>
